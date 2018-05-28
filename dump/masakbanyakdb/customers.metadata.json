@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"masakbanyakdb.customers"},{"v":2,"unique":true,"key":{"email":1.0},"name":"email_1","ns":"masakbanyakdb.customers"}],"uuid":"e4f05d9b8ea3466ca0a4b14470693abd"}

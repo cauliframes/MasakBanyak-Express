@@ -31,7 +31,8 @@ router.post('/customer/register', function(req, res, next){
                         name: req.body.name,
                         phone: req.body.phone,
                         email: req.body.email,
-                        password: hash
+                        password: hash,
+                        avatar: "http://192.168.0.33:3000/images/customer_avatar/default.jpg"
                     }
     
                     collection.insertOne(user, function(err, writeResult){

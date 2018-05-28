@@ -8,6 +8,7 @@ var verifyAuth = require('./verify-auth');
 var authRouter = require('./routes/auth');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var customersRouter = require('./routes/customers');
 var cateringsRouter = require('./routes/caterings');
 
 var app = express();
@@ -26,6 +27,7 @@ app.use('/auth', authRouter);
 app.use(verifyAuth);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/customers', customersRouter);
 app.use('/caterings', cateringsRouter);
 
 // catch 404 and forward to error handler
