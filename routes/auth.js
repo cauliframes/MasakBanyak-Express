@@ -2,17 +2,17 @@ var express = require('express');
 var router = express.Router();
 var bcrypt = require('bcrypt-nodejs');
 var jwt = require('jsonwebtoken');
-var secret = require('../secret');
+var secret = require('../my_modules/secret');
 var uuid = require('uuid/v4');
 var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectId;
+var url = require('../my_modules/mongo-url');
 
-var url = 'mongodb://localhost:27017';
 var dbName = 'masakbanyakdb';
 var collectionName01 = 'customers';
 var collectionName02 = 'refresh_tokens';
 
-router.post('/customer/register', function(req, res, next){
+router.post('/customers/register', function(req, res, next){
     MongoClient.connect(url, {useNewUrlParser: true}, function(err, client){
         if(err){throw err}
         var db = client.db(dbName);
@@ -32,7 +32,7 @@ router.post('/customer/register', function(req, res, next){
                         phone: req.body.phone,
                         email: req.body.email,
                         password: hash,
-                        avatar: "http://192.168.0.33:3000/images/customer_avatar/default.jpg"
+                        avatar: "/images/customer_avatar/default.jpg"
                     }
     
                     collection.insertOne(user, function(err, writeResult){
@@ -46,7 +46,7 @@ router.post('/customer/register', function(req, res, next){
     });
 });
 
-router.post('/customer/login', function(req, res, next){
+router.post('/customers/login', function(req, res, next){
     MongoClient.connect(url, {useNewUrlParser: true}, function(err, client){
         if(err){throw err}
         var db = client.db(dbName);
@@ -94,7 +94,7 @@ router.post('/customer/login', function(req, res, next){
     });
 });
 
-router.post('/customer/refresh', function(req, res, next){
+router.post('/customers/refresh', function(req, res, next){
     MongoClient.connect(url, {useNewUrlParser: true}, function(err, client){
         if(err){throw err}
         var db = client.db(dbName);
@@ -125,7 +125,7 @@ router.post('/customer/refresh', function(req, res, next){
     });
 });
 
-router.post('/customer/logout', function(req, res, next){
+router.post('/customers/logout', function(req, res, next){
     MongoClient.connect(url, {useNewUrlParser: true}, function(err, client){
         var db = client.db(dbName);
         var collection02 = db.collection(collectionName02);

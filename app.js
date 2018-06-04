@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var verifyAuth = require('./verify-auth');
+var verifyAuth = require('./my_modules/verify-auth');
 
 var authRouter = require('./routes/auth');
 var indexRouter = require('./routes/index');

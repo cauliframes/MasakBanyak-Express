@@ -1,16 +1,29 @@
 var express = require('express');
 var router = express.Router();
+var fs = require('fs');
 var jwt = require('jsonwebtoken');
+var path = require('path');
 var multer = require('multer');
-var upload = multer({dest: "./public/images/customer_avatar"});
+var storage = multer.diskStorage({
+    destination: function(req, file, callback){
+        callback(null, "./public/images/customer_avatar");
+    },
+    filename: function(req, file, callback){
+        var token = String(req.header('Authorization').substr('Bearer '.length));
+        var customer_id = String(jwt.decode(token).customer_id);
+        var filename = customer_id+Date.now()+path.extname(file.originalname);
+        callback(null, filename);
+    }
+});
+var upload = multer({storage: storage});
 var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectId;
+var url = require('../my_modules/mongo-url');
 
-router.get('/profile', function(req, res, next){
-    var url = 'mongodb://localhost:27017';
-    var dbName = 'masakbanyakdb';
-    var token = String(req.header('Authorization').substr('Bearer '.length));
-    var customer_id = jwt.decode(token).customer_id;
+var dbName = 'masakbanyakdb';
+
+router.get('/:id', function(req, res, next){
+    var customer_id = req.params.id;
 
     MongoClient.connect(url, {useNewUrlParser: true}, function(err, client){
         if(err) throw err;
@@ -33,11 +46,8 @@ router.get('/profile', function(req, res, next){
     });
 });
 
-router.put('/profile/update', function(req, res, next){
-    var url = 'mongodb://localhost:27017';
-    var dbName = 'masakbanyakdb';
-    var token = String(req.header('Authorization').substr('Bearer '.length));
-    var customer_id = String(jwt.decode(token).customer_id);
+router.put('/:id/update', function(req, res, next){
+    var customer_id = req.params.id;
     var updateQuery = {_id: ObjectId(customer_id)}
     var updateValue = { 
         $set: {
@@ -59,16 +69,60 @@ router.put('/profile/update', function(req, res, next){
                 res.status(400).send("Hmm.. update gagal, maaf ya.");
             }
         });
+
+        client.close();
     });
+
 });
 
-router.post('/profile/avatar', upload.single('avatar'), function(req, res, next){
-    var url = 'mongodb://localhost:27017';
-    var dbName = 'masakbanyakdb';
-    var token = String(req.header('Authorization').substr('Bearer '.length));
-    var customer_id = String(jwt.decode(token).customer_id);
+router.post(
+    '/:id/avatar', 
+    function(req, res, next){
+        var customer_id = req.params.id;
+        var query = {_id: ObjectId(customer_id)};
+        var projection = {avatar: 1}
 
-    res.send(req.file.path);
-});
+        MongoClient.connect(url, {useNewUrlParser: true}, function(err, client){
+            var db = client.db(dbName);
+            var collection = db.collection('customers');
+            collection.findOne(query, function(err, doc){
+                if(err) throw err;
+                var filePath = 'public'+doc.avatar;
+                
+                fs.stat(filePath, function(err, stat){
+                    if(err == null){
+                        fs.unlink(filePath, function(err){
+                            if(err) throw err;
+                            next();
+                        });
+                    }else if(err.code === 'ENOENT'){
+                        next();
+                    }else{
+                        throw err;
+                    }
+                });
+            });
+            client.close();
+        });
+    }, 
+    upload.single('avatar'), 
+    function(req, res, next){
+        var customer_id = req.params.id;
+        var filePath = path.normalize(req.file.path.substr('public'.length));
+        var query = {_id: ObjectId(customer_id)}
+        var updateValue = {$set: {avatar: filePath}}
+
+        MongoClient.connect(url, {useNewUrlParser: true}, function(err, client){
+            var db = client.db(dbName);
+            var collection = db.collection('customers');
+
+            collection.updateOne(query, updateValue, function(err, result){
+                if(err) throw err;
+                res.send('Berhasil upload, maaf ya.');
+            });
+            client.close();
+        });
+    }
+);
 
 module.exports = router;
