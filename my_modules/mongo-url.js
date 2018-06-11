@@ -1,1 +1,1 @@
-module.exports = 'mongodb://localhost:27017';
+module.exports = 'mongodb://argerich:campanell4@ds247670.mlab.com:47670/masakbanyakdb';
