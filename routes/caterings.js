@@ -8,6 +8,7 @@ var dbName = 'masakbanyakdb';
 
 router.get('/', function(req, res, next){
     MongoClient.connect(url, {useNewUrlParser: true}, function(err, client){
+        if(err) throw err;
         var db = client.db(dbName);
         var collection = db.collection('caterings');
         var result = collection.find().project({password: 0}).toArray(function(err, docs){
