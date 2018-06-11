@@ -26,3 +26,5 @@ router.post('/', function(req, res, next){
         body: req.body
     }).then((result) => res.json(result.body));
 });
+
+module.exports = router;
