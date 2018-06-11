@@ -18,13 +18,14 @@ router.post('/', function(req, res, next){
     //    //Insert the orders to db, make an http post request to midtrans transaction, and proxy the response to client
     // });
 
+    var encodedKey = Buffer.from(serverKey+":").toString('base64');
     got.post(midtransUrl, {
         json: true,
         headers: {
-          authorization: "Basic "+serverKey+":"  
+          authorization: "Basic "+encodedKey
         },
         body: req.body
-    }).then((result) => res.json(result.body));
+    }).then((result) => res.json(result.body), (reason) => res.json(reason));
 });
 
 module.exports = router;
