@@ -18,7 +18,7 @@ router.post('/', function(req, res, next){
     //    //Insert the orders to db, make an http post request to midtrans transaction, and proxy the response to client
     // });
 
-    got.post(url, {
+    got.post(midtransUrl, {
         json: true,
         headers: {
           authorization: "Basic "+serverKey+":"  
