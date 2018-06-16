@@ -24,13 +24,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/charge', chargeRouter);
 app.use('/auth', authRouter);
 app.use(verifyAuth);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/customers', customersRouter);
 app.use('/caterings', cateringsRouter);
-app.use('/charge', chargeRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

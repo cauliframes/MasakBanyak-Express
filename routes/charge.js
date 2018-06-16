@@ -22,10 +22,11 @@ router.post('/', function(req, res, next){
     got.post(midtransUrl, {
         json: true,
         headers: {
-          authorization: "Basic "+encodedKey
+          Authorization: "Basic "+encodedKey
         },
         body: req.body
     }).then((result) => res.json(result.body), (reason) => res.json(reason));
+    console.log(req.body);
 });
 
 module.exports = router;
