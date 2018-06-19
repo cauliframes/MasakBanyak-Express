@@ -27,13 +27,15 @@ router.post('/notification', function (req, res, next) {
         var collection = db.collection('orders');
 
         var queryObject = {_id: ObjectId(req.body.order_id)}
-        var updateObject = {status: req.body.transaction_status}
+        var updateObject = {$set: {status: req.body.transaction_status}}
 
         collection.findOneAndUpdate(queryObject, updateObject, function(err, result){
             if(err) throw err;
             console.log(result.ok);
             res.send('notification received.')
-        })
+        });
+
+        client.close();
     });
 });
 
