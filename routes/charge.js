@@ -20,9 +20,8 @@ router.post('/', function (req, res, next) {
             packet_id: ObjectId(req.body.item_details[0].id),
             quantity: req.body.item_details[0].quantity,
             total_price: req.body.transaction_details.gross_amount,
-            date: "Ini tanggal acara",
-            time: "Ini waktu acara",
-            location: "Ini lokasi acara"
+            datetime: "Ini tanggal acara",
+            status: "Ini status pemesanan"
         }
 
         collections.insertOne(insertObject, function (err, response) {
