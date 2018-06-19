@@ -24,21 +24,22 @@ router.post('/notification', function (req, res, next) {
 
     console.log(req.body);
 
-    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
-        var db = client.db('masakbanyakdb');
-        var collection = db.collection('orders');
+    res.send('notification received.');
+    // MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
+    //     var db = client.db('masakbanyakdb');
+    //     var collection = db.collection('orders');
 
-        var queryObject = { _id: ObjectId(req.body.order_id) }
-        var updateObject = { $set: { status: req.body.transaction_status } }
+    //     var queryObject = { _id: ObjectId(req.body.order_id) }
+    //     var updateObject = { $set: { status: req.body.transaction_status } }
 
-        collection.findOneAndUpdate(queryObject, updateObject, function (err, result) {
-            if (err) throw err;
-            console.log(result.ok);
-            res.send('notification received.')
-        });
+    //     collection.findOneAndUpdate(queryObject, updateObject, function (err, result) {
+    //         if (err) throw err;
+    //         console.log(result.ok);
+    //         res.send('notification received.')
+    //     });
 
-        client.close();
-    });
+    //     client.close();
+    // });
 });
 
 module.exports = router;

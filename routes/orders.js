@@ -9,6 +9,8 @@ router.post('/', function (req, res, next) {
         var db = client.db('masakbanyakdb');
         var collection = db.collection('orders');
 
+        
+
         var insertObject = {
             _id: ObjectId(req.body._id),
             customer_id: ObjectId(req.body.customer_id),
