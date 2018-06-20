@@ -39,7 +39,7 @@ router.post('/notification', function (req, res, next) {
         var collection = db.collection('orders');
 
         var queryObject = { _id: ObjectId(req.body.order_id) }
-        var replaceObject = {
+        var updateObject = {
             _id: ObjectId(metadata._id),
             customer_id: ObjectId(metadata.customer_id),
             packet_id: ObjectId(metadata.packet_id),
@@ -49,12 +49,12 @@ router.post('/notification', function (req, res, next) {
             event_time: new Date(metadata.datetime),
             event_address: metadata.address,
             status: req.body.transaction_status,
-            virtual_account: req.body.va_numbers[0],            
+            virtual_account: req.body.va_numbers[0],
         }
 
-        collection.findOneAndReplace(queryObject, replaceObject, function (err, result) {
+        collection.updateOne(queryObject, updateObject, { upsert: true }, function (err, result) {
             if (err) throw err;
-            console.log(result.ok);
+            console.log(result.result.ok);
             console.log('notification received');
             res.send('notification received.')
         });
