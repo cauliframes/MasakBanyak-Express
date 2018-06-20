@@ -49,8 +49,8 @@ router.post('/notification', function (req, res, next) {
                 order_time: new Date(req.body.transaction_time),
                 event_time: new Date(metadata.datetime),
                 event_address: metadata.address,
-                status: req.body.transaction_status,
                 virtual_account: req.body.va_numbers[0],
+                status: req.body.transaction_status
             }
         }
 
