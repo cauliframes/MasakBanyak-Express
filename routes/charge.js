@@ -21,7 +21,7 @@ router.post('/', function (req, res, next) {
         address: req.body.custom_field2,
     }
 
-    req.body.custom_field3 = metadata;
+    req.body.custom_field3 = JSON.stringify(metadata);
 
     var authKey = Buffer.from(serverKey + ":").toString('base64');
     got.post(midtransUrl, {
@@ -32,44 +32,35 @@ router.post('/', function (req, res, next) {
 });
 
 router.post('/notification', function (req, res, next) {
-    console.log('notification received.');
+    var metadata = JSON.parse(req.body.custom_field3);
 
-    var metadata = JSON(req.body.custom_field3);
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
+        var db = client.db('masakbanyakdb');
+        var collection = db.collection('orders');
 
-    console.log('tis the customer id');
-    console.log(metadata.customer_id);
+        var queryObject = { _id: ObjectId(req.body.order_id) }
+        var replaceObject = {
+            _id: ObjectId(metadata._id),
+            customer_id: ObjectId(metadata.customer_id),
+            packet_id: ObjectId(metadata.packet_id),
+            quantity: metadata.quantity,
+            total_price: metadata.total_price,
+            order_time: new Date(req.body.transaction_time),
+            event_time: new Date(metadata.datetime),
+            event_address: metadata.address,
+            status: req.body.transaction_status,
+            virtual_account: req.body.va_numbers[0],            
+        }
 
-    console.log('tis the packet id');
-    console.log(metadata.packet_id);
+        collection.findOneAndReplace(queryObject, replaceObject, function (err, result) {
+            if (err) throw err;
+            console.log(result.ok);
+            console.log('notification received');
+            res.send('notification received.')
+        });
 
-    res.send('notification received');
-    
-    // var insertObject = {
-    //     _id: ObjectId(req.body._id),
-    //     customer_id: ObjectId(req.body.customer_id),
-    //     packet_id: ObjectId(req.body.packet_id),
-    //     quantity: req.body.quantity,
-    //     total_price: req.body.total_price,
-    //     datetime: new Date(req.body.datetime),
-    //     address: req.body.address,
-    //     status: req.body.status
-    // }
-
-    // MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
-    //     var db = client.db('masakbanyakdb');
-    //     var collection = db.collection('orders');
-
-    //     var queryObject = { _id: ObjectId(req.body.order_id) }
-    //     var updateObject = { $set: { status: req.body.transaction_status } }
-
-    //     collection.findOneAndUpdate(queryObject, updateObject, function (err, result) {
-    //         if (err) throw err;
-    //         console.log(result.ok);
-    //         res.send('notification received.')
-    //     });
-
-    //     client.close();
-    // });
+        client.close();
+    });
 });
 
 module.exports = router;
