@@ -40,16 +40,18 @@ router.post('/notification', function (req, res, next) {
 
         var queryObject = { _id: ObjectId(req.body.order_id) }
         var updateObject = {
-            _id: ObjectId(metadata._id),
-            customer_id: ObjectId(metadata.customer_id),
-            packet_id: ObjectId(metadata.packet_id),
-            quantity: metadata.quantity,
-            total_price: metadata.total_price,
-            order_time: new Date(req.body.transaction_time),
-            event_time: new Date(metadata.datetime),
-            event_address: metadata.address,
-            status: req.body.transaction_status,
-            virtual_account: req.body.va_numbers[0],
+            $set: {
+                _id: ObjectId(metadata._id),
+                customer_id: ObjectId(metadata.customer_id),
+                packet_id: ObjectId(metadata.packet_id),
+                quantity: metadata.quantity,
+                total_price: metadata.total_price,
+                order_time: new Date(req.body.transaction_time),
+                event_time: new Date(metadata.datetime),
+                event_address: metadata.address,
+                status: req.body.transaction_status,
+                virtual_account: req.body.va_numbers[0],
+            }
         }
 
         collection.updateOne(queryObject, updateObject, { upsert: true }, function (err, result) {
