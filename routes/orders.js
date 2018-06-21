@@ -15,7 +15,7 @@ router.get('/', function (req, res, next) {
             queryObject.customer_id = ObjectId(req.query.customer_id);
         }
 
-        collection.find(queryObject).toArray(function (err, docs) {
+        collection.find(queryObject).sort({_id: -1}).toArray(function (err, docs) {
             if (err) throw err;
             res.json(docs);
         });
