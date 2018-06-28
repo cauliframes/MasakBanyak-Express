@@ -31,10 +31,10 @@ app.use('/auth', authRouter);
 app.use(verifyAuth);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/customers', customersRouter);
 app.use('/caterings', cateringsRouter);
-app.use('/orders', ordersRouter);
 app.use('/packets', packetsRouter);
+app.use('/orders', ordersRouter);
+app.use('/customers', customersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
