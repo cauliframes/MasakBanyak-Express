@@ -85,4 +85,33 @@ router.get('/:id/orders', function (req, res, next) {
     });
 });
 
+router.put('/:id/update', function (req, res, next) {
+    var catering_id = req.params.id;
+    var updateQuery = { _id: ObjectId(catering_id) }
+    var updateValue = {
+        $set: {
+            name: req.body.name,
+            address: req.body.address,
+            phone: req.body.phone
+        }
+    }
+
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
+        var db = client.db(dbName);
+        var collection = db.collection('caterings');
+
+        collection.updateOne(updateQuery, updateValue, function (err, result) {
+            if (err) throw err;
+            if (result.modifiedCount > 0) {
+                res.send('Berhasil update, maaf ya.');
+            } else {
+                res.status(400).send("Hmm.. update gagal, maaf ya.");
+            }
+        });
+
+        client.close();
+    });
+
+});
+
 module.exports = router;
