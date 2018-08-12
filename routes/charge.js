@@ -58,7 +58,7 @@ router.post('/notification', function (req, res, next) {
             if (err) throw err;
             console.log(result.result.ok);
             console.log('notification received');
-            res.send('notification received.')
+            res.send('notification received.');
         });
 
         client.close();

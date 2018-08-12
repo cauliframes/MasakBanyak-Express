@@ -26,23 +26,57 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+//test, delete later
+var fs = require('fs');
+var MongoClient = require('mongodb').MongoClient;
+var ObjectId = require('mongodb').ObjectId;
+var url = require('./my_modules/mongo-url');
+
+app.post('/test/:id', function (req, res, next) {
+  var customer_id = req.params.id;
+  var query = { _id: ObjectId(customer_id) };
+
+  MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
+    var db = client.db('masakbanyakdb');
+    var collection = db.collection('customers');
+    
+    collection.findOne(query, function (err, doc) {
+      if (err) throw err;
+      var filePath = 'public' + doc.avatar;
+
+      fs.stat(filePath, function (err, stat) {
+        if (err == null) {
+          res.send('file exist');
+        } else if (err.code === 'ENOENT') {
+          res.send('file doesn\'t exist');
+        } else {
+          throw err;
+        }
+      });
+
+    });
+    client.close();
+  });
+});
+
+app.use('/caterings', cateringsRouter);
+app.use('/orders', ordersRouter);
 app.use('/charge', chargeRouter);
 app.use('/auth', authRouter);
 app.use(verifyAuth);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/caterings', cateringsRouter);
+
 app.use('/packets', packetsRouter);
-app.use('/orders', ordersRouter);
 app.use('/customers', customersRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

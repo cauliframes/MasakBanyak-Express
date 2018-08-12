@@ -72,36 +72,40 @@ router.put('/:id/update', function (req, res, next) {
 
         client.close();
     });
-
 });
 
-router.post(
-    '/:id/avatar',
+router.post('/:id/avatar',
     function (req, res, next) {
         var customer_id = req.params.id;
         var query = { _id: ObjectId(customer_id) };
-        var projection = { avatar: 1 }
 
         MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
             var db = client.db(dbName);
             var collection = db.collection('customers');
+            
             collection.findOne(query, function (err, doc) {
                 if (err) throw err;
                 var filePath = 'public' + doc.avatar;
 
-                fs.stat(filePath, function (err, stat) {
-                    if (err == null) {
-                        fs.unlink(filePath, function (err) {
-                            if (err) throw err;
+                if (doc.avatar === '/images/customer_avatar/default.jpg') {
+                    next();
+                } else {
+                    //check if file exists
+                    fs.stat(filePath, function (err, stat) {
+                        if (err == null) {
+                            fs.unlink(filePath, function (err) {
+                                if (err) throw err;
+                                next();
+                            });
+                        } else if (err.code === 'ENOENT') {
                             next();
-                        });
-                    } else if (err.code === 'ENOENT') {
-                        next();
-                    } else {
-                        throw err;
-                    }
-                });
+                        } else {
+                            throw err;
+                        }
+                    });
+                }
             });
+
             client.close();
         });
     },
