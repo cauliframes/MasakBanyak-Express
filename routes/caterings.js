@@ -195,8 +195,11 @@ router.put('/:id/update', function (req, res, next) {
 
         collection.updateOne(updateQuery, updateValue, function (err, result) {
             if (err) throw err;
-
-            res.send('Berhasil update, maaf ya.');
+            if (result.modifiedCount > 0) {
+                res.send('Berhasil update, maaf ya.');
+            } else {
+                res.status(400).send("Hmm.. update gagal, maaf ya.");
+            }
         });
 
         client.close();
