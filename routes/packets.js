@@ -93,7 +93,7 @@ router.post('/:id/image', upload.single('image'), function (req, res, next) {
             } else {
                 collection.updateOne(query, updateValue, function (err, result) {
                     if (err) throw err;
-                    res.send('Berhasil upload, maaf ya.');
+                    res.send('Berhasil upload, maaf ya.');findOne
                     client.close();
                 });
             }

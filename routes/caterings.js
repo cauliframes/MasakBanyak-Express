@@ -47,7 +47,7 @@ router.get('/search/:keyword', function (req, res, next) {
         var findObject = { name: { $regex: RegExp("\\b.*" + keyword + ".*\\b"), $options: "i" } };
 
         collection.find(findObject).project({ password: 0 }).toArray(function (err, docs) {
-            if (err) { throw err } 
+            if (err) { throw err }
             res.json(docs);
             client.close();
         });
@@ -205,6 +205,49 @@ router.put('/:id/update', function (req, res, next) {
         client.close();
     });
 
+});
+
+router.put('/:id/rate', function (req, res, next) {
+    var catering_id = req.params.id;
+    var customer_id = req.body.customer_id;
+    var rating_value = req.body.rating_value;
+
+    var selectionObject = { _id: ObjectId(catering_id), "ratings.customer_id": ObjectId(customer_id) };
+
+    var updateObject = {
+        $set: {
+            "ratings.$.rating_value": rating_value
+        }
+    }
+
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
+        var db = client.db('masakbanyakdb');
+        var collection = db.collection('caterings');
+
+        collection.update(selectionObject, updateObject, function (err, result) {
+            if (result.result.nModified === 0) {
+
+                var selectionObject02 = { _id: ObjectId(catering_id) };
+
+                var updateObject02 = {
+                    $push: {
+                        ratings: {
+                            customer_id: ObjectId(customer_id),
+                            rating_value: rating_value
+                        }
+                    }
+                }
+
+                collection.update(selectionObject02, updateObject02, function(err, result){
+                    if(err) throw err;
+                    res.send('Berhasil memberi penilaian.')
+                });
+            } else {
+                if(err) throw err;
+                res.send('Berhasil memberi penilaian.');
+            }
+        });
+    });
 });
 
 module.exports = router;
