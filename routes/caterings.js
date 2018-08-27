@@ -153,12 +153,21 @@ router.post('/:id/packets', function (req, res, next) {
             images: ["/images/packet_images/default.jpg"],
         }
 
-        collection.insertOne(insertObject, function (err, result) {
+        collection.find({ name: req.body.name }).toArray(function (err, docs) {
             if (err) throw err;
-            res.send("Paket berhasil ditambahkan, maaf ya.");
+
+            if (docs.length === 0) {
+                collection.insertOne(insertObject, function (err, result) {
+                    if (err) throw err;
+                    res.send("Paket berhasil ditambahkan, maaf ya.");
+                    client.close();
+                });
+            } else {
+                res.status(400).send("Maaf sudah ada paket dengan nama yang sama.");
+                client.close();
+            }
         });
 
-        client.close();
     });
 });
 
@@ -238,12 +247,12 @@ router.put('/:id/rate', function (req, res, next) {
                     }
                 }
 
-                collection.update(selectionObject02, updateObject02, function(err, result){
-                    if(err) throw err;
+                collection.update(selectionObject02, updateObject02, function (err, result) {
+                    if (err) throw err;
                     res.send('Berhasil memberi penilaian.')
                 });
             } else {
-                if(err) throw err;
+                if (err) throw err;
                 res.send('Berhasil memberi penilaian.');
             }
         });
